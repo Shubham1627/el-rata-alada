@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  admin-frontend:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend/admin/index.html:/usr/share/nginx/html/index.html
+      - ./frontend/admin/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+
+  friend-frontend:
+    image: nginx:alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ./frontend/friend/index.html:/usr/share/nginx/html/index.html
+      - ./frontend/friend/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+

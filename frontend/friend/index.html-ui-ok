@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Friend Console</title>
+  <style>
+    body {
+      background: black;
+      color: lime;
+      font-family: monospace;
+      font-size: 18px;
+      padding: 10px;
+    }
+    #log {
+      height: 70vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+      border: 1px solid lime;
+      padding: 5px;
+    }
+    input {
+      width: 100%;
+      background: black;
+      color: lime;
+      font-size: 18px;
+      border: none;
+      outline: none;
+      padding: 6px;
+    }
+    button {
+      background: black;
+      color: lime;
+      border: 1px solid lime;
+      padding: 6px 10px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h3>Friend UI</h3>
+
+<div id="log"></div>
+
+<input id="msg" placeholder="Type message" disabled>
+
+<script>
+const log = document.getElementById("log");
+const msg = document.getElementById("msg");
+
+// Get chat_id from URL
+const urlParams = new URLSearchParams(window.location.search);
+const chatId = urlParams.get("chat");
+
+if (!chatId) {
+  write("[SYSTEM] Invalid chat URL");
+} else {
+  write("[SYSTEM] Connected to chat: " + chatId);
+  msg.disabled = false;
+}
+
+// Helper to log messages
+function write(text) {
+  log.innerHTML += text + "\n";
+  log.scrollTop = log.scrollHeight;
+}
+
+// Send friend message
+msg.addEventListener("keydown", e => {
+  if (e.key === "Enter" && msg.value.trim() && chatId) {
+    fetch("/api/message", {
+      method: "POST",
+      body: JSON.stringify({
+        chat_id: chatId,
+        from: "Friend",
+        message: msg.value
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    write("Friend> " + msg.value);
+    msg.value = "";
+  }
+});
+</script>
+
+</body>
+</html>
+

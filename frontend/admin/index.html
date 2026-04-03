@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Console</title>
+  <style>
+    body {
+      background: black;
+      color: lime;
+      font-family: monospace;
+      font-size: 18px;
+      padding: 10px;
+    }
+    #log {
+      height: 70vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+      border: 1px solid lime;
+      padding: 5px;
+    }
+    input {
+      width: 100%;
+      background: black;
+      color: lime;
+      font-size: 18px;
+      border: none;
+      outline: none;
+      padding: 6px;
+    }
+    button {
+      background: black;
+      color: lime;
+      border: 1px solid lime;
+      padding: 6px 10px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h3>Admin UI</h3>
+
+<div id="log"></div>
+
+<input id="msg" placeholder="Type message" disabled>
+
+<br><br>
+<button id="createBtn">Create Chat</button>
+<button onclick="endChat()">End Chat</button>
+
+<script>
+const log = document.getElementById("log");
+const msg = document.getElementById("msg");
+const createBtn = document.getElementById("createBtn");
+
+let chatActive = false;
+let currentChat = null;
+
+function write(text) {
+  log.innerHTML += text + "\n";
+  log.scrollTop = log.scrollHeight;
+}
+
+// Create chat
+createBtn.addEventListener("click", () => {
+  fetch("/api/create-chat")
+    .then(r => r.json())
+    .then(d => {
+      chatActive = true;
+      msg.disabled = false;
+      currentChat = d.chat_id; 
+      write("[SYSTEM] Chat created");
+      write("Share URL: " + d.friend_url);
+      createBtn.style.display = "none";
+    });
+});
+
+// End chat
+function endChat() {
+  chatActive = false;
+  msg.disabled = true;
+  write("[SYSTEM] Chat ended");
+  currentChat = null;
+  createBtn.style.display = "inline-block";
+}
+
+// Send message as plain text (old backend style)
+msg.addEventListener("keydown", e => {
+  if (e.key === "Enter" && msg.value.trim() && chatActive) {
+    fetch("/api/admin/message", {
+      method: "POST",
+      body: msg.value // ⚡ plain text, exactly like old backend expects
+    });
+    write("Admin> " + msg.value);
+    msg.value = "";
+  }
+});
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Console</title>
+  <style>
+    body { background:black; color:lime; font-family:monospace; }
+    input { width:100%; background:black; color:lime; font-size:18px; }
+    button { background:black; color:lime; border:1px solid lime; }
+  </style>
+</head>
+<body>
+
+<h3>Admin UI</h3>
+<div id="log"></div>
+<input id="msg" placeholder="Type message" disabled>
+
+<br><br>
+<button onclick="createChat()">Create Chat</button>
+<button onclick="endChat()">End Chat</button>
+
+<script>
+const log = document.getElementById("log");
+const msg = document.getElementById("msg");
+
+function write(text) {
+  log.innerHTML += text + "<br>";
+}
+
+function createChat() {
+  fetch("/api/create-chat")
+    .then(r => r.json())
+    .then(d => {
+      write("[SYSTEM] Chat created");
+      write("Share URL: " + d.friend_url);
+    });
+}
+
+msg.addEventListener("keydown", e => {
+  if (e.key === "Enter" && msg.value.trim()) {
+    fetch("/api/admin/message", {
+      method: "POST",
+      body: msg.value
+    });
+    msg.value = "";
+  }
+});
+</script>
+
+
+</body>
+</html>
+

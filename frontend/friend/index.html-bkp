@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body style="background:black;color:lime;font-family:monospace">
+<h3>Friend UI</h3>
+<input id="msg" placeholder="Type and press Enter">
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const token = params.get("chat");
+
+document.getElementById("msg").addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.value.trim()) {
+    fetch("/api/friend/message", {
+      method: "POST",
+      body: e.target.value
+    });
+    e.target.value = "";
+  }
+});
+</script>
+</body>
+</html>
+
